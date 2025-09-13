@@ -15,7 +15,7 @@ client.on("message", (message) =>{
     // console.log('Sending Ping...')
     .then((msg) => {
       msg.edit("Pong! " + Date.now() - msg.createdTimestamp) + "ms");
-    })
+    });
   }
 });
 
