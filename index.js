@@ -1,14 +1,22 @@
 const Discord = require("discord.js")
-const client = new Discord.Client()
+const client = new Discord.Client({intents: [
+  Discord.GatewayIntentBits.Guilds,
+  Discord.GatewayIntentBits.GuildMessages,
+  Discord.GatewayIntentBits.MessageContent
+]})
 
 client.once("ready", () => {
   console.log('${client.user.tag} is up and ready!')
 });
 
-client.on("message", async message =>{
-  if (message.content.startsWith("sudo ping"))
-  {
-    message.channel.send('Pong! Latency is ${client.ws.ping}ms')
+client.on("message", (message) =>{
+  if (message.content === "sudo ping") {
+    message.channel.send("Pinging...");
+    // console.log('Sending Ping...')
+    .then((message) => {
+      message.edit("Pong! + Date.now() - msg.createdTimestamp) + "ms");
+    })
+  }
 });
 
 client.login(bob_token);
