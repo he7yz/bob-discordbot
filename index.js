@@ -10,13 +10,13 @@ client.once("ready", () => {
 });
 
 client.on("message", (message) =>{
-  if (message.content === "sudo ping") {
-    message.channel.send("Pinging...")
-    // console.log('Sending Ping...')
-    .then((msg) => {
-      msg.edit("Pong! " + Date.now() - msg.createdTimestamp) + "ms");
-    });
+  if (message.content === 'sudo ping') {
+    message.channel.send("Pinging ...")
+      // console.log('Sending Ping...')
+      .then((msg) => {
+        msg.edit("Pong: " + (Date.now() - msg.createdTimestamp) + "ms")
+      });
   }
-});
+})
 
 client.login(bob_token);
