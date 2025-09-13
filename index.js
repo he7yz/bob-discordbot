@@ -11,10 +11,10 @@ client.once("ready", () => {
 
 client.on("message", (message) =>{
   if (message.content === "sudo ping") {
-    message.channel.send("Pinging...");
+    message.channel.send("Pinging...")
     // console.log('Sending Ping...')
-    .then((message) => {
-      message.edit("Pong! + Date.now() - msg.createdTimestamp) + "ms");
+    .then((msg) => {
+      msg.edit("Pong! " + Date.now() - msg.createdTimestamp) + "ms");
     })
   }
 });
