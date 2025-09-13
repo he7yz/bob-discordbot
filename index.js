@@ -6,13 +6,13 @@ const client = new Discord.Client({intents: [
 ]})
 
 client.once("ready", () => {
-  console.log('${client.user.tag} is up and ready!')
+  console.log(`${client.user.tag} is up and ready!`)
 });
 
-client.on("message", (message) =>{
+client.on("messageCreate", (message) =>{
   if (message.content === 'sudo ping') {
     message.channel.send("Pinging ...")
-      // console.log('Sending Ping...')
+      // console.log(`Sending Ping...`)
       .then((msg) => {
         msg.edit("Pong: " + (Date.now() - msg.createdTimestamp) + "ms")
       });
