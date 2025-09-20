@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "captcha-canvas": "^3.3.4",
+    "discord.js": "^14.22.1",
+    "dotenv": "^17.2.2"
+  }
+}
