@@ -1,4 +1,5 @@
 require('dotenv').config();
+
 const Discord = require("discord.js");
 const client = new Discord.Client({intents: [
   Discord.GatewayIntentBits.Guilds,
@@ -8,7 +9,12 @@ const client = new Discord.Client({intents: [
   Discord.GatewayIntentBits.GuildPresences, // this intent fixes the userCount issue :)
 ]});
 
-console.log(process.env);
+client.cooldowns = new Map();
+client.cache = new Map();
+
+require('./utilities/ComponentsLoader.js')(client);
+require('./utilities/SlashCommands.js')(client);
+console.log(process.env); //just for debugging, remove if needed
 
 client.once("clientReady", () => {
   console.log(`${client.user.tag} is up and ready!`);

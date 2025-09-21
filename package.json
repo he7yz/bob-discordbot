@@ -1,6 +1,8 @@
 {
   "dependencies": {
+    "@discordjs/rest": "^2.6.0",
     "captcha-canvas": "^3.3.4",
+    "discord-api-types": "^0.38.26",
     "discord.js": "^14.22.1",
     "dotenv": "^17.2.2"
   }
