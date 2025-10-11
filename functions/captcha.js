@@ -39,7 +39,7 @@ async function captcha(text, toReply, author) {
   .generateSync()
 
   const captchaBuffer = Buffer.from(captcha);
-  const attacment = new AttachmentBuilder(captchaBuffer, { name: "captcha.png"});
+  const attachment = new AttachmentBuilder(captchaBuffer, { name: "captcha.png"});
 
   const embed = new EmbedBuilder()
   .setColor("Blurple")
@@ -61,12 +61,12 @@ async function captcha(text, toReply, author) {
     ephemeral: true
   });
 
-  const collector = new InteractionCollector(toReply.client, { message: msg, time 600000});
+  const collector = new InteractionCollector(toReply.client, { message: msg, time: 600000});
   const modalCollector = new InteractionCollector(toReply.client);
 
   collector.on("collect", async i => {
     if (i.customId == "captchabutton"){
-      if (author !== i.user ) return await i.reply({ content: `⚠️ Only ${author.username} can use this.`, ephemeral = true});
+      if (author !== i.user ) return await i.reply({ content: `⚠️ Only ${author.username} can use this.`, ephemeral: true});
 
       const capModal = new ModalBuilder()
       .setTitle("Verify Your Captcha Answer")
@@ -87,10 +87,11 @@ async function captcha(text, toReply, author) {
         const respondAns = mI.fields.getTextInputValue("captchaanswer");
 
         if (respondAns != capText) {
-          return await mI.reply({ content: `⚠️ That was wrong! Try again`, ephemeral = true}).catch(err => {});
+          return await mI.reply({ content: `⚠️ That was wrong! Try again`, ephemeral: true}).catch(err => {});
         } else {
-          await mI.reply({ content: `🌐 You have sucessfully passed the Captcha Verification.`, ephemeral = true }).catch(err => {});
+          await mI.reply({ content: `🌐 Seems that you are human!`, ephemeral: true }).catch(err => {});
           await msg.delete().catch(err => {});
+          output = true;
         }
       });
     }

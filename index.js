@@ -6,7 +6,7 @@ const client = new Discord.Client({intents: [
   Discord.GatewayIntentBits.GuildMessages,
   Discord.GatewayIntentBits.MessageContent,
   Discord.GatewayIntentBits.GuildMembers,
-  Discord.GatewayIntentBits.GuildPresences, // this intent fixes the userCount issue :)
+  Discord.GatewayIntentBits.GuildPresences,
 ]});
 
 client.cooldowns = new Map();
@@ -30,7 +30,32 @@ client.once("clientReady", () => {
   });
 });
 
-client.on("messageCreate", (message) =>{ //message is also deprecated, uses messageCreate now..
+client.on('interactionCreate', async interaction => {
+  if (!interaction.isChatInputCommand()) return;
+
+  const command = client.commands.get(interaction.commandName);
+  
+  if (!command) {
+    console.log(`No command matching ${interaction.commandName} was found.`);
+    return;
+  }
+
+  try {
+    await command.execute(interaction);
+  } catch (error) {
+    console.error(`Error executing ${interaction.commandName}:`, error);
+    
+    const errorMessage = { content: '❌ There was an error executing this command!', ephemeral: true };
+    
+    if (interaction.replied || interaction.deferred) {
+      await interaction.followUp(errorMessage);
+    } else {
+      await interaction.reply(errorMessage);
+    }
+  }
+});
+
+client.on("messageCreate", (message) =>{
   if (message.content === 'sudo ping') {
     message.channel.send("Pinging ...")
       // console.log(`Sending Ping...`)
