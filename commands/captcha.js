@@ -1,5 +1,5 @@
-const {SlashCommandBuilder} = require('discord.js');
-const captcha = require('./functions/captcha.js');
+const {SlashCommandBuilder, MessageFlags} = require('discord.js');
+const captcha = require('../functions/captcha.js');
 
 module.exports = {
   data : new SlashCommandBuilder()
@@ -7,7 +7,7 @@ module.exports = {
   .setDescription('Captcha Testing'),
   async execute (interaction) {
     
-    await interaction.reply({ content: `🌐 Captcha Interaction Testing`, ephemeral = true});
+    await interaction.reply({ content: `🌐 Captcha Interaction Testing`, ephemeral: true});
 
     await captcha("random", interaction, interaction.user);
 
@@ -19,10 +19,10 @@ module.exports = {
     await interaction.client.cache.delete(interaction.id);
     await interaction.editReply("✅ Approved from Captcha :D");
 
-    const member = await message.guild.members.fetch(message.author.id);
-    await member.roles.add("1415363731176554648"); // PLAYER role auto add
+    const member = await interaction.guild.members.fetch(interaction.user.id);
+    await member.roles.add("1415363731176554648"); // PLAYER role add 
 
-    await interaction.reply("Welcome To MMUCraft!");
+    await interaction.followUp({content:"Welcome To MMUCraft!", flags: MessageFlags.Ephemeral});
 
   }
 }
