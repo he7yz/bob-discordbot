@@ -9,13 +9,14 @@ const {
   InteractionCollector,
   ModalBuilder,
   TextInputBuilder,
-  TextInputStyle
+  TextInputStyle,
+  MessageFlags
 } = require('discord.js'); 
 
 async function captcha(text, toReply, author) {
-  if (!text) throw new Error("You didn't provide any text. Use `random` for a random string: captcha(text, toReply, author)");
-  if (!toReply) throw new Error("You didn't provide a valid method to reply to: captcha(text, toReply {either message/interaction obj.}, author)");
-  if (!author) throw new Error("You didn't provide a valid USER component: captcha(text, toReply, author);");
+  if (!text) throw new Error("No Text Provided. Use `random` for a random string: captcha(text, toReply, author)");
+  if (!toReply) throw new Error("No Valid Method Provided to reply to: captcha(text, toReply {either message/interaction obj.}, author)");
+  if (!author) throw new Error("No Valid USER component: captcha(text, toReply, author);");
   
   var output = false;
 
@@ -32,25 +33,34 @@ async function captcha(text, toReply, author) {
   } else capText =text;
 
   const captcha = new CaptchaGenerator()
-  .setDimension(150,450)
-  .setCaptcha({ text: capText, size: 60, color: "green"})
+  .setDimension(300,800)
+  .setCaptcha({ text: capText, size: 80, color: "#00FF00"})
   .setDecoy({ opacity: 0.5})
-  .setTrace({ color: "green"})
+  .setTrace({ color: "#00FF00"})
   .generateSync()
 
   const captchaBuffer = Buffer.from(captcha);
   const attachment = new AttachmentBuilder(captchaBuffer, { name: "captcha.png"});
 
   const embed = new EmbedBuilder()
-  .setColor("Blurple")
+  .setAuthor({ 
+    name: 'Captcha Verification', 
+    iconURL: 'https://wiki.hypixel.net/images/1/10/SkyBlock_items_enchanted_eye_of_ender.gif'
+  })
+  .setColor("#170c63")
   .setImage('attachment://captcha.png')
-  .setDescription(`⚠️ ${author}, you must solve the captcha to get access into MMUCraft! (case-sensitive)`);
+  .setDescription(`<:hardcoreheart:1426657947009679497> ${author}, you must solve the captcha to get access into MMUCraft! **Keep in mind, it is case-sensitive!**`)
+  .setTimestamp()
+  .setFooter({ 
+    text: 'MMUCraft Discord', 
+    iconURL: 'https://cdn.discordapp.com/emojis/1415316601976393788.webp?size=96' 
+  });
 
   const button = new ActionRowBuilder()
   .setComponents(
     new ButtonBuilder()
     .setCustomId('captchabutton')
-    .setLabel(`💭 Solve`)
+    .setLabel(`💭 Solve Captcha`)
     .setStyle(ButtonStyle.Danger),
   );
 
@@ -58,15 +68,26 @@ async function captcha(text, toReply, author) {
     embeds: [embed],
     files: [attachment],
     components: [button],
-    ephemeral: true
+    flags: MessageFlags.Ephemeral
   });
+
+  setTimeout(async () => {
+    if (!output) {
+    await msg.delete().catch(err => console.log('Captcha message deleted due to inactivity.')); 
+
+    await toReply.followUp({content: `<:witheredheart:1426639604030902283> Captcha verification period expired. Please try again.`, flags: MessageFlags.Ephemeral });
+
+    collector.stop('timeout');
+    modalCollector.stop('timeout');
+    }
+  }, 60000);
 
   const collector = new InteractionCollector(toReply.client, { message: msg, time: 600000});
   const modalCollector = new InteractionCollector(toReply.client);
 
   collector.on("collect", async i => {
     if (i.customId == "captchabutton"){
-      if (author !== i.user ) return await i.reply({ content: `⚠️ Only ${author.username} can use this.`, ephemeral: true});
+      if (author !== i.user ) return await i.reply({ content: `<:mace:1426654675674857592> Only ${author.username} can use this.`, flags: MessageFlags.Ephemeral});
 
       const capModal = new ModalBuilder()
       .setTitle("Verify Your Captcha Answer")
@@ -75,7 +96,7 @@ async function captcha(text, toReply, author) {
       const answer = new TextInputBuilder()
       .setCustomId("captchaanswer")
       .setLabel("Your Captcha Answer")
-      .setPlaceholder("Submit the captcha given. If you got it wrong, skill issue lol.")
+      .setPlaceholder("Submit the captcha given. If you got it wrong, skill issue")
       .setStyle(TextInputStyle.Short);
 
       const row = new ActionRowBuilder().addComponents(answer);
@@ -87,9 +108,9 @@ async function captcha(text, toReply, author) {
         const respondAns = mI.fields.getTextInputValue("captchaanswer");
 
         if (respondAns != capText) {
-          return await mI.reply({ content: `⚠️ That was wrong! Try again`, ephemeral: true}).catch(err => {});
+          return await mI.reply({ content: `<:witheredheart:1426639604030902283> That was wrong! Try again`, flags: MessageFlags.Ephemeral}).catch(err => {});
         } else {
-          await mI.reply({ content: `🌐 Seems that you are human!`, ephemeral: true }).catch(err => {});
+          await mI.reply({ content: `<:mace:1426654675674857592> Verifying that you aren't a mob...`, flags: MessageFlags.Ephemeral }).catch(err => {});
           await msg.delete().catch(err => {});
           output = true;
         }
