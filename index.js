@@ -1,6 +1,9 @@
 require('dotenv').config();
 
 const Discord = require("discord.js");
+const fs = require('fs');
+const path = require('path');
+
 const client = new Discord.Client({intents: [
   Discord.GatewayIntentBits.Guilds,
   Discord.GatewayIntentBits.GuildMessages,
@@ -14,13 +17,24 @@ client.cache = new Map();
 
 require('./utilities/ComponentsLoader.js')(client);
 require('./utilities/SlashCommands.js')(client);
-console.log(process.env); //just for debugging, remove if needed
+// console.log(process.env);
+
+const messageCommands = new Map();
+const eventsPath = path.join(__dirname, 'events');
+const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+
+for (const file of eventFiles) {
+  const event = require(`./events/${file}`);
+  if (event.trigger) {
+    messageCommands.set(event.trigger, event);
+  }
+}
 
 client.once("clientReady", () => {
   console.log(`${client.user.tag} is up and ready!`);
 
   //discordRPC status (WIP)
-  const userCount = client.users.cache.size;
+  const userCount = client.users.cache.size - 2;
 
   client.user.setActivity({
     name:`${userCount} Players in MMUCraft`,
@@ -55,14 +69,17 @@ client.on('interactionCreate', async interaction => {
   }
 });
 
-client.on("messageCreate", (message) =>{
-  if (message.content === 'sudo ping') {
-    message.channel.send("Pinging ...")
-      // console.log(`Sending Ping...`)
-      .then((msg) => {
-        msg.edit("Pong: " + (Date.now() - msg.createdTimestamp) + "ms")
-      });
+client.on("messageCreate", (message) => {
+  if (message.author.bot) return;
+  
+  const command = messageCommands.get(message.content);
+  if (command) {
+    try {
+      command.execute(message);
+    } catch (error) {
+      console.error(`Error executing ${message.content}:`, error);
+    }
   }
-})
+});
 
 client.login(process.env.BOB_TOKEN);
