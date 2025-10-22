@@ -23,10 +23,15 @@ const messageCommands = new Map();
 const eventsPath = path.join(__dirname, 'events');
 const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
+let autoDeleterHandler = null;
+
 for (const file of eventFiles) {
   const event = require(`./events/${file}`);
   if (event.trigger) {
     messageCommands.set(event.trigger, event);
+  }
+  if (event.channelId) {
+    autoDeleterHandler = event;
   }
 }
 
@@ -59,7 +64,7 @@ client.on('interactionCreate', async interaction => {
   } catch (error) {
     console.error(`Error executing ${interaction.commandName}:`, error);
     
-    const errorMessage = { content: '❌ There was an error executing this command!', ephemeral: true };
+    const errorMessage = { content: 'Error occured while executing this command.', flags: MessageFlags.Ephemeral  };
     
     if (interaction.replied || interaction.deferred) {
       await interaction.followUp(errorMessage);
@@ -71,6 +76,10 @@ client.on('interactionCreate', async interaction => {
 
 client.on("messageCreate", (message) => {
   if (message.author.bot) return;
+
+  if (autoDeleterHandler) {
+    autoDeleterHandler.execute(message);
+  }
   
   const command = messageCommands.get(message.content);
   if (command) {
