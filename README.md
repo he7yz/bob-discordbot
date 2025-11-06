@@ -15,16 +15,23 @@ $ npm install
 Then, download these dependencies.
 - `discord.js` (v14.22.1+)
 - `discord-api-types` (v0.38.26+)
-- `@discord.js/rest` (v2.6.0+)
+- `@discordjs/rest` (v2.6.0+)
 - `captcha-canvas` (v3.3.4+)
-- `dotenv` (17.2.2+)
+- `dotenv` (v17.2.2+)
+- `axios` (v1.13.2+)
+- `canvas` (v3.2.0+)
+- `gif-encoder-2` (v1.0.5+)
+- `gif-frames` (v1.0.1+)
+- `image-size` (v2.0.2+)
+- `jimp` (v1.6.0+)
 ```bash
-$ npm i discord.js discord-api-types @discord.js/rest captcha-canvas dotenv
+$ npm i discord.js discord-api-types @discordjs/rest captcha-canvas dotenv axios canvas gif-encoder-2 gif-frames image-size jimp
 ```
 
 Next, rename `.env_examples` to `.env` and make sure to insert the credentials.
+- 
 
 Lastly, run Bob!
 ```bash
-# npm .
+$ node .
 ```

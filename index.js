@@ -3,6 +3,7 @@ require('dotenv').config();
 const Discord = require("discord.js");
 const fs = require('fs');
 const path = require('path');
+const Welcomer = require('./events/welcomer.js');
 
 const client = new Discord.Client({intents: [
   Discord.GatewayIntentBits.Guilds,
@@ -88,6 +89,32 @@ client.on("messageCreate", (message) => {
     } catch (error) {
       console.error(`Error executing ${message.content}:`, error);
     }
+  }
+});
+
+client.on('guildMemberAdd', async (member) => {
+  try {
+    const welcomeChannel = member.guild.channels.cache.get('1415358335540002988');
+    
+    if (!welcomeChannel) return;
+
+    const welcomer = new Welcomer()
+      .setName(member.user.username)
+      .setDiscriminator(`#${member.user.discriminator}`)
+      .setAvatar(member.user.displayAvatarURL({ extension: 'png', size: 1024 }))
+      .setGif(false);
+
+    const image = await welcomer.generate();
+
+    await welcomeChannel.send({
+      content: `${member} **has joined the world!**`,
+      files: [{
+        attachment: image,
+        name: 'welcome.png'
+      }]
+    });
+  } catch (error) {
+    console.error('[Welcomer] Event broke. =>', error);
   }
 });
 
